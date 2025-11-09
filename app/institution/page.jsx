@@ -363,12 +363,13 @@ export default function InstitutionDashboard() {
 
                 {/* Main Content Tabs */}
                 <Tabs defaultValue="overview" className="space-y-6">
-                    <TabsList className="grid w-full grid-cols-6">
+                    <TabsList className="grid w-full grid-cols-7">
                         <TabsTrigger value="overview">Overview</TabsTrigger>
                         <TabsTrigger value="faculties">Faculties</TabsTrigger>
                         <TabsTrigger value="courses">Courses</TabsTrigger>
                         <TabsTrigger value="admissions">Admissions</TabsTrigger>
                         <TabsTrigger value="applications">Applications</TabsTrigger>
+                        <TabsTrigger value="analytics">Analytics</TabsTrigger>
                         <TabsTrigger value="profile">Profile</TabsTrigger>
                     </TabsList>
 
@@ -913,3 +914,354 @@ export default function InstitutionDashboard() {
                                         id="course-duration"
                                         value={courseForm.duration}
                                         onChange={(e) => setCourseForm({ ...courseForm, duration: e.target.value })}
+                                        placeholder="e.g., 4 years"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <Label htmlFor="course-description">Description</Label>
+                                <Textarea
+                                    id="course-description"
+                                    value={courseForm.description}
+                                    onChange={(e) => setCourseForm({ ...courseForm, description: e.target.value })}
+                                    placeholder="Course description"
+                                />
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <Label htmlFor="course-fees">Fees</Label>
+                                    <Input
+                                        id="course-fees"
+                                        value={courseForm.fees}
+                                        onChange={(e) => setCourseForm({ ...courseForm, fees: e.target.value })}
+                                        placeholder="e.g., LSL 5000 per year"
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="course-capacity">Capacity</Label>
+                                    <Input
+                                        id="course-capacity"
+                                        type="number"
+                                        value={courseForm.capacity}
+                                        onChange={(e) => setCourseForm({ ...courseForm, capacity: e.target.value })}
+                                        placeholder="50"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <Button variant="outline" onClick={() => setCourseDialogOpen(false)}>
+                                    Cancel
+                                </Button>
+                                <Button onClick={handleCourseSubmit}>
+                                    {selectedCourse ? 'Update' : 'Create'} Course
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Analytics Tab */}
+                <TabsContent value="analytics" className="space-y-6">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {/* Applications Analytics */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <FileText className="h-5 w-5" />
+                                    Applications Analytics
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-slate-600">Total Applications</span>
+                                        <span className="font-bold text-lg">{totalApplications}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-slate-600">Pending</span>
+                                        <span className="font-bold text-yellow-600">{pendingApplications}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-slate-600">Accepted</span>
+                                        <span className="font-bold text-green-600">{acceptedApplications}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-slate-600">Rejected</span>
+                                        <span className="font-bold text-red-600">{rejectedApplications}</span>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Courses Analytics */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <BookOpen className="h-5 w-5" />
+                                    Courses Analytics
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-slate-600">Total Courses</span>
+                                        <span className="font-bold text-lg">{courses.length}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-slate-600">Faculties</span>
+                                        <span className="font-bold text-lg">{faculties.length}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-slate-600">Avg Courses per Faculty</span>
+                                        <span className="font-bold text-lg">{faculties.length > 0 ? (courses.length / faculties.length).toFixed(1) : 0}</span>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Admissions Analytics */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <TrendingUp className="h-5 w-5" />
+                                    Admissions Analytics
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-slate-600">Total Admissions</span>
+                                        <span className="font-bold text-lg">{admissions.length}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-slate-600">Published</span>
+                                        <span className="font-bold text-green-600">{admissions.filter(a => a.status === 'published').length}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm text-slate-600">Draft</span>
+                                        <span className="font-bold text-yellow-600">{admissions.filter(a => a.status === 'draft').length}</span>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Additional Analytics */}
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Performance Overview</CardTitle>
+                            <CardDescription>Key performance indicators for your institution</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 className="font-medium text-slate-800 mb-2">Application Success Rate</h4>
+                                    <div className="text-3xl font-bold text-green-600">
+                                        {totalApplications > 0 ? ((acceptedApplications / totalApplications) * 100).toFixed(1) : 0}%
+                                    </div>
+                                    <p className="text-sm text-slate-600 mt-1">Accepted applications out of total</p>
+                                </div>
+                                <div>
+                                    <h4 className="font-medium text-slate-800 mb-2">Institution Capacity Utilization</h4>
+                                    <div className="text-3xl font-bold text-blue-600">
+                                        {courses.length > 0 ? ((courses.reduce((sum, course) => sum + (course.enrolled || 0), 0) / courses.reduce((sum, course) => sum + course.capacity, 0)) * 100).toFixed(1) : 0}%
+                                    </div>
+                                    <p className="text-sm text-slate-600 mt-1">Current enrollment vs total capacity</p>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* Admissions Dialog */}
+                <Dialog open={admissionDialogOpen} onOpenChange={setAdmissionDialogOpen}>
+                    <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle>{selectedAdmission ? 'Edit Admission' : 'Create New Admission'}</DialogTitle>
+                            <DialogDescription>
+                                {selectedAdmission ? 'Update admission information' : 'Create a new admission announcement'}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <div>
+                                <Label htmlFor="admission-title">Title</Label>
+                                <Input
+                                    id="admission-title"
+                                    value={admissionForm.title}
+                                    onChange={(e) => setAdmissionForm({ ...admissionForm, title: e.target.value })}
+                                    placeholder="e.g., 2024 Undergraduate Admissions"
+                                />
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <Label htmlFor="admission-type">Type</Label>
+                                    <Select value={admissionForm.type} onValueChange={(value) => setAdmissionForm({ ...admissionForm, type: value })}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Select type" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="undergraduate">Undergraduate</SelectItem>
+                                            <SelectItem value="postgraduate">Postgraduate</SelectItem>
+                                            <SelectItem value="certificate">Certificate</SelectItem>
+                                            <SelectItem value="diploma">Diploma</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div>
+                                    <Label htmlFor="admission-deadline">Deadline</Label>
+                                    <Input
+                                        id="admission-deadline"
+                                        type="date"
+                                        value={admissionForm.deadline}
+                                        onChange={(e) => setAdmissionForm({ ...admissionForm, deadline: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <Label htmlFor="admission-description">Description</Label>
+                                <Textarea
+                                    id="admission-description"
+                                    value={admissionForm.description}
+                                    onChange={(e) => setAdmissionForm({ ...admissionForm, description: e.target.value })}
+                                    placeholder="Admission requirements and information"
+                                />
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <Button variant="outline" onClick={() => setAdmissionDialogOpen(false)}>
+                                    Cancel
+                                </Button>
+                                <Button onClick={handleAdmissionSubmit}>
+                                    {selectedAdmission ? 'Update' : 'Create'} Admission
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Profile Dialog */}
+                <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+                    <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                            <DialogTitle>Edit Institution Profile</DialogTitle>
+                            <DialogDescription>Update your institution information</DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <Label htmlFor="profile-name">Institution Name</Label>
+                                    <Input
+                                        id="profile-name"
+                                        value={profileForm.name}
+                                        onChange={(e) => setProfileForm({ ...profileForm, name: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="profile-type">Type</Label>
+                                    <Input
+                                        id="profile-type"
+                                        value={profileForm.type}
+                                        onChange={(e) => setProfileForm({ ...profileForm, type: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <Label htmlFor="profile-location">Location</Label>
+                                    <Input
+                                        id="profile-location"
+                                        value={profileForm.location}
+                                        onChange={(e) => setProfileForm({ ...profileForm, location: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <Label htmlFor="profile-website">Website</Label>
+                                    <Input
+                                        id="profile-website"
+                                        value={profileForm.website}
+                                        onChange={(e) => setProfileForm({ ...profileForm, website: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <Label htmlFor="profile-description">Description</Label>
+                                <Textarea
+                                    id="profile-description"
+                                    value={profileForm.description}
+                                    onChange={(e) => setProfileForm({ ...profileForm, description: e.target.value })}
+                                />
+                            </div>
+                            <div className="flex justify-end gap-2">
+                                <Button variant="outline" onClick={() => setProfileDialogOpen(false)}>
+                                    Cancel
+                                </Button>
+                                <Button onClick={handleProfileSubmit}>
+                                    Update Profile
+                                </Button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Application Dialog */}
+                <Dialog open={applicationDialogOpen} onOpenChange={setApplicationDialogOpen}>
+                    <DialogContent className="max-w-4xl">
+                        <DialogHeader>
+                            <DialogTitle>Application Details</DialogTitle>
+                            <DialogDescription>Review application information</DialogDescription>
+                        </DialogHeader>
+                        {selectedApplication && (
+                            <div className="space-y-6">
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    <div>
+                                        <h4 className="font-medium text-slate-800 mb-2">Applicant Information</h4>
+                                        <div className="space-y-2">
+                                            <p><span className="font-medium">Name:</span> {selectedApplication.fullName}</p>
+                                            <p><span className="font-medium">Email:</span> {selectedApplication.email}</p>
+                                            <p><span className="font-medium">Phone:</span> {selectedApplication.phone}</p>
+                                            <p><span className="font-medium">Date of Birth:</span> {selectedApplication.dateOfBirth}</p>
+                                            <p><span className="font-medium">Nationality:</span> {selectedApplication.nationality}</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-medium text-slate-800 mb-2">Application Details</h4>
+                                        <div className="space-y-2">
+                                            <p><span className="font-medium">Course:</span> {getCourseName(selectedApplication.institutionId, selectedApplication.courseName)}</p>
+                                            <p><span className="font-medium">Applied Date:</span> {new Date(selectedApplication.submittedAt).toLocaleDateString()}</p>
+                                            <p><span className="font-medium">Status:</span> {getStatusBadge(selectedApplication.status)}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <h4 className="font-medium text-slate-800 mb-2">Academic Background</h4>
+                                    <div className="space-y-2">
+                                        <p><span className="font-medium">Highest Qualification:</span> {selectedApplication.highestQualification}</p>
+                                        <p><span className="font-medium">Institution:</span> {selectedApplication.previousInstitution}</p>
+                                        <p><span className="font-medium">Grade:</span> {selectedApplication.grade}</p>
+                                    </div>
+                                </div>
+                                {selectedApplication.status === 'pending' && (
+                                    <div className="flex gap-2">
+                                        <Button
+                                            className="bg-green-600 hover:bg-green-700"
+                                            onClick={() => handleApplicationAction(selectedApplication.id, 'accepted')}
+                                        >
+                                            <CheckCircle className="w-4 h-4 mr-2" />
+                                            Accept Application
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            onClick={() => handleApplicationAction(selectedApplication.id, 'rejected')}
+                                        >
+                                            <XCircle className="w-4 h-4 mr-2" />
+                                            Reject Application
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </DialogContent>
+                </Dialog>
+            </div>
+        </div>
+    )
+}

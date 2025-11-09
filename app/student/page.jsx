@@ -53,6 +53,7 @@ export default function StudentDashboard() {
     const [transcriptDialogOpen, setTranscriptDialogOpen] = useState(false)
     const [jobApplications, setJobApplications] = useState([])
     const [notifications, setNotifications] = useState([])
+    const [showApplicationsSection, setShowApplicationsSection] = useState(false)
     const [profileData, setProfileData] = useState({
         phone: "",
         address: "",
@@ -851,246 +852,258 @@ export default function StudentDashboard() {
                                                         </CardContent>
                                                     </Card>
                                                 </TabsContent>
-                                            </Tabs>
+                                            </div>
+                                        </TabsContent>
 
-                                            {/* Profile Update Dialog */}
-                                            <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
-                                                <DialogContent>
-                                                    <DialogHeader>
-                                                        <DialogTitle>Update Profile</DialogTitle>
-                                                        <DialogDescription>Update your personal information</DialogDescription>
-                                                    </DialogHeader>
-                                                    <div className="space-y-4">
-                                                        <Input
-                                                            placeholder="Phone Number"
-                                                            value={profileData.phone}
-                                                            onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
-                                                        />
-                                                        <Textarea
-                                                            placeholder="Address"
-                                                            value={profileData.address}
-                                                            onChange={(e) => setProfileData(prev => ({ ...prev, address: e.target.value }))}
-                                                        />
-                                                        <Input
-                                                            placeholder="Emergency Contact"
-                                                            value={profileData.emergencyContact}
-                                                            onChange={(e) => setProfileData(prev => ({ ...prev, emergencyContact: e.target.value }))}
-                                                        />
-                                                        <Button onClick={handleProfileUpdate} className="w-full">
-                                                            Update Profile
+                                        {/* Graduate Module */}
+                                        <TabsContent value="graduate">
+                                            <div className="space-y-8">
+                                                {/* Graduate Assessment */}
+                                                <Card>
+                                                    <CardHeader>
+                                                        <CardTitle className="flex items-center gap-2">
+                                                            <Briefcase className="h-5 w-5" />
+                                                            Graduate Assessment & Job Recommendations
+                                                        </CardTitle>
+                                                        <CardDescription>Enter your qualifications to get personalized job recommendations</CardDescription>
+                                                    </CardHeader>
+                                                    <CardContent>
+                                                        <div className="grid md:grid-cols-4 gap-4 mb-6">
+                                                            <Input
+                                                                placeholder="GPA (e.g., 3.5)"
+                                                                value={gpa}
+                                                                onChange={(e) => setGpa(e.target.value)}
+                                                            />
+                                                            <Select value={qualificationLevel} onValueChange={setQualificationLevel}>
+                                                                <SelectTrigger>
+                                                                    <SelectValue placeholder="Qualification Level" />
+                                                                </SelectTrigger>
+                                                                <SelectContent>
+                                                                    <SelectItem value="certificate">Certificate</SelectItem>
+                                                                    <SelectItem value="diploma">Diploma</SelectItem>
+                                                                    <SelectItem value="degree">Degree</SelectItem>
+                                                                    <SelectItem value="masters">Masters</SelectItem>
+                                                                    <SelectItem value="phd">PhD</SelectItem>
+                                                                </SelectContent>
+                                                            </Select>
+                                                            <Input
+                                                                placeholder="Field of Study"
+                                                                value={field}
+                                                                onChange={(e) => setField(e.target.value)}
+                                                            />
+                                                            <Input
+                                                                placeholder="Institution"
+                                                                value={institution}
+                                                                onChange={(e) => setInstitution(e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <Button
+                                                            onClick={() => setShowJobRecommendations(!showJobRecommendations)}
+                                                            className="w-full"
+                                                        >
+                                                            <Target className="h-4 w-4 mr-2" />
+                                                            {showJobRecommendations ? "Hide Job Recommendations" : "Get Job Recommendations"}
                                                         </Button>
-                                                    </div>
-                                                </DialogContent>
-                                            </Dialog>
+                                                    </CardContent>
+                                                </Card>
 
-                                            {/* Transcript Upload Dialog */}
-                                            <Dialog open={transcriptDialogOpen} onOpenChange={setTranscriptDialogOpen}>
-                                                <DialogContent>
-                                                    <DialogHeader>
-                                                        <DialogTitle>Upload Documents</DialogTitle>
-                                                        <DialogDescription>Upload your academic transcripts and certificates</DialogDescription>
-                                                    </DialogHeader>
-                                                    <div className="space-y-4">
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-2">Transcripts</label>
-                                                            <Input
-                                                                type="file"
-                                                                accept=".doc,.docx"
-                                                                onChange={handleTranscriptUpload}
-                                                                multiple
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="block text-sm font-medium mb-2">Certificates</label>
-                                                            <Input
-                                                                type="file"
-                                                                accept=".doc,.docx"
-                                                                onChange={handleCertificateUpload}
-                                                                multiple
-                                                            />
-                                                        </div>
-                                                        {transcriptData.transcripts.length > 0 && (
-                                                            <div>
-                                                                <h4 className="font-medium mb-2">Uploaded Transcripts:</h4>
-                                                                <ul className="space-y-1">
-                                                                    {transcriptData.transcripts.map((file, index) => (
-                                                                        <li key={index} className="text-sm text-slate-600">{file.name}</li>
-                                                                    ))}
-                                                                </ul>
+                                                {/* Job Recommendations */}
+                                                {showJobRecommendations && recommendedJobs.length > 0 && (
+                                                    <Card>
+                                                        <CardHeader>
+                                                            <CardTitle>Recommended Jobs for You</CardTitle>
+                                                            <CardDescription>Based on your qualifications and GPA</CardDescription>
+                                                        </CardHeader>
+                                                        <CardContent>
+                                                            <div className="space-y-4">
+                                                                {recommendedJobs.map((job, index) => (
+                                                                    <Card key={index} className="border-slate-200">
+                                                                        <CardContent className="pt-4">
+                                                                            <div className="flex justify-between items-start">
+                                                                                <div>
+                                                                                    <h3 className="font-medium text-lg">{job.title}</h3>
+                                                                                    <p className="text-slate-600">{job.company} - {job.location}</p>
+                                                                                    <p className="text-sm text-slate-500 mt-1">{job.requirements}</p>
+                                                                                    <p className="text-sm font-medium text-green-600 mt-1">Salary: {job.salary}</p>
+                                                                                </div>
+                                                                                <Button onClick={() => handleApply(job)}>
+                                                                                    Apply Now
+                                                                                </Button>
+                                                                            </div>
+                                                                        </CardContent>
+                                                                    </Card>
+                                                                ))}
                                                             </div>
-                                                        )}
-                                                        {transcriptData.certificates.length > 0 && (
-                                                            <div>
-                                                                <h4 className="font-medium mb-2">Uploaded Certificates:</h4>
-                                                                <ul className="space-y-1">
-                                                                    {transcriptData.certificates.map((file, index) => (
-                                                                        <li key={index} className="text-sm text-slate-600">{file.name}</li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </DialogContent>
-                                            </Dialog>
-                                        </div>
-                                </TabsContent>
+                                                        </CardContent>
+                                                    </Card>
+                                                )}
 
-                                {/* Graduate Module */}
-                                <TabsContent value="graduate">
-                                    <div className="space-y-8">
-                                        {/* Graduate Assessment */}
-                                        <Card>
-                                            <CardHeader>
-                                                <CardTitle className="flex items-center gap-2">
-                                                    <Briefcase className="h-5 w-5" />
-                                                    Graduate Assessment & Job Recommendations
-                                                </CardTitle>
-                                                <CardDescription>Enter your qualifications to get personalized job recommendations</CardDescription>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <div className="grid md:grid-cols-4 gap-4 mb-6">
-                                                    <Input
-                                                        placeholder="GPA (e.g., 3.5)"
-                                                        value={gpa}
-                                                        onChange={(e) => setGpa(e.target.value)}
-                                                    />
-                                                    <Select value={qualificationLevel} onValueChange={setQualificationLevel}>
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Qualification Level" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="certificate">Certificate</SelectItem>
-                                                            <SelectItem value="diploma">Diploma</SelectItem>
-                                                            <SelectItem value="degree">Degree</SelectItem>
-                                                            <SelectItem value="masters">Masters</SelectItem>
-                                                            <SelectItem value="phd">PhD</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <Input
-                                                        placeholder="Field of Study"
-                                                        value={field}
-                                                        onChange={(e) => setField(e.target.value)}
-                                                    />
-                                                    <Input
-                                                        placeholder="Institution"
-                                                        value={institution}
-                                                        onChange={(e) => setInstitution(e.target.value)}
-                                                    />
-                                                </div>
-                                                <Button
-                                                    onClick={() => setShowJobRecommendations(!showJobRecommendations)}
-                                                    className="w-full"
-                                                >
-                                                    <Target className="h-4 w-4 mr-2" />
-                                                    {showJobRecommendations ? "Hide Job Recommendations" : "Get Job Recommendations"}
-                                                </Button>
-                                            </CardContent>
-                                        </Card>
-
-                                        {/* Job Recommendations */}
-                                        {showJobRecommendations && recommendedJobs.length > 0 && (
-                                            <Card>
-                                                <CardHeader>
-                                                    <CardTitle>Recommended Jobs for You</CardTitle>
-                                                    <CardDescription>Based on your qualifications and GPA</CardDescription>
-                                                </CardHeader>
-                                                <CardContent>
-                                                    <div className="space-y-4">
-                                                        {recommendedJobs.map((job, index) => (
-                                                            <Card key={index} className="border-slate-200">
-                                                                <CardContent className="pt-4">
-                                                                    <div className="flex justify-between items-start">
+                                                {/* Job Applications */}
+                                                {jobApplications.length > 0 && (
+                                                    <Card>
+                                                        <CardHeader>
+                                                            <CardTitle>Your Job Applications</CardTitle>
+                                                            <CardDescription>Track your job application status</CardDescription>
+                                                        </CardHeader>
+                                                        <CardContent>
+                                                            <div className="space-y-4">
+                                                                {jobApplications.map((application, index) => (
+                                                                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                                                                         <div>
-                                                                            <h3 className="font-medium text-lg">{job.title}</h3>
-                                                                            <p className="text-slate-600">{job.company} - {job.location}</p>
-                                                                            <p className="text-sm text-slate-500 mt-1">{job.requirements}</p>
-                                                                            <p className="text-sm font-medium text-green-600 mt-1">Salary: {job.salary}</p>
+                                                                            <h3 className="font-medium">{application.jobTitle}</h3>
+                                                                            <p className="text-sm text-slate-600">{application.company}</p>
+                                                                            <p className="text-xs text-slate-500">Applied: {new Date(application.appliedDate).toLocaleDateString()}</p>
                                                                         </div>
-                                                                        <Button onClick={() => handleApply(job)}>
-                                                                            Apply Now
-                                                                        </Button>
+                                                                        <Badge variant={application.status === "Accepted" ? "default" : "secondary"}>
+                                                                            {application.status}
+                                                                        </Badge>
                                                                     </div>
-                                                                </CardContent>
-                                                            </Card>
-                                                        ))}
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        )}
-
-                                        {/* Job Applications */}
-                                        {jobApplications.length > 0 && (
-                                            <Card>
-                                                <CardHeader>
-                                                    <CardTitle>Your Job Applications</CardTitle>
-                                                    <CardDescription>Track your job application status</CardDescription>
-                                                </CardHeader>
-                                                <CardContent>
-                                                    <div className="space-y-4">
-                                                        {jobApplications.map((application, index) => (
-                                                            <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
-                                                                <div>
-                                                                    <h3 className="font-medium">{application.jobTitle}</h3>
-                                                                    <p className="text-sm text-slate-600">{application.company}</p>
-                                                                    <p className="text-xs text-slate-500">Applied: {new Date(application.appliedDate).toLocaleDateString()}</p>
-                                                                </div>
-                                                                <Badge variant={application.status === "Accepted" ? "default" : "secondary"}>
-                                                                    {application.status}
-                                                                </Badge>
+                                                                ))}
                                                             </div>
-                                                        ))}
-                                                    </div>
-                                                </CardContent>
-                                            </Card>
-                                        )}
+                                                        </CardContent>
+                                                    </Card>
+                                                )}
 
-                                        {/* Job Application Dialog */}
-                                        <Dialog open={applicationDialogOpen} onOpenChange={setApplicationDialogOpen}>
-                                            <DialogContent>
-                                                <DialogHeader>
-                                                    <DialogTitle>Apply for {selectedJob?.title}</DialogTitle>
-                                                    <DialogDescription>Submit your application for this position</DialogDescription>
-                                                </DialogHeader>
-                                                <div className="space-y-4">
-                                                    <Input
-                                                        placeholder="Full Name"
-                                                        value={applicationForm.fullName}
-                                                        onChange={(e) => setApplicationForm(prev => ({ ...prev, fullName: e.target.value }))}
-                                                    />
-                                                    <Input
-                                                        placeholder="Email"
-                                                        type="email"
-                                                        value={applicationForm.email}
-                                                        onChange={(e) => setApplicationForm(prev => ({ ...prev, email: e.target.value }))}
-                                                    />
-                                                    <Input
-                                                        placeholder="Phone Number"
-                                                        value={applicationForm.phone}
-                                                        onChange={(e) => setApplicationForm(prev => ({ ...prev, phone: e.target.value }))}
-                                                    />
-                                                    <Textarea
-                                                        placeholder="Cover Letter"
-                                                        value={applicationForm.coverLetter}
-                                                        onChange={(e) => setApplicationForm(prev => ({ ...prev, coverLetter: e.target.value }))}
-                                                    />
-                                                    <div>
-                                                        <label className="block text-sm font-medium mb-2">Resume (Word Document)</label>
-                                                        <Input
-                                                            type="file"
-                                                            accept=".doc,.docx"
-                                                            onChange={handleFileUpload}
-                                                        />
-                                                    </div>
-                                                    <Button onClick={handleSubmitApplication} className="w-full">
-                                                        Submit Application
-                                                    </Button>
-                                                </div>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </div>
-                                </TabsContent>
-                            </Tabs>
+                                                {/* Job Application Dialog */}
+                                                <Dialog open={applicationDialogOpen} onOpenChange={setApplicationDialogOpen}>
+                                                    <DialogContent>
+                                                        <DialogHeader>
+                                                            <DialogTitle>Apply for {selectedJob?.title}</DialogTitle>
+                                                            <DialogDescription>Submit your application for this position</DialogDescription>
+                                                        </DialogHeader>
+                                                        <div className="space-y-4">
+                                                            <Input
+                                                                placeholder="Full Name"
+                                                                value={applicationForm.fullName}
+                                                                onChange={(e) => setApplicationForm(prev => ({ ...prev, fullName: e.target.value }))}
+                                                            />
+                                                            <Input
+                                                                placeholder="Email"
+                                                                type="email"
+                                                                value={applicationForm.email}
+                                                                onChange={(e) => setApplicationForm(prev => ({ ...prev, email: e.target.value }))}
+                                                            />
+                                                            <Input
+                                                                placeholder="Phone Number"
+                                                                value={applicationForm.phone}
+                                                                onChange={(e) => setApplicationForm(prev => ({ ...prev, phone: e.target.value }))}
+                                                            />
+                                                            <Textarea
+                                                                placeholder="Cover Letter"
+                                                                value={applicationForm.coverLetter}
+                                                                onChange={(e) => setApplicationForm(prev => ({ ...prev, coverLetter: e.target.value }))}
+                                                            />
+                                                            <div>
+                                                                <label className="block text-sm font-medium mb-2">Resume (Word Document)</label>
+                                                                <Input
+                                                                    type="file"
+                                                                    accept=".doc,.docx"
+                                                                    onChange={handleFileUpload}
+                                                                />
+                                                            </div>
+                                                            <Button onClick={handleSubmitApplication} className="w-full">
+                                                                Submit Application
+                                                            </Button>
+                                                        </div>
+                                                    </DialogContent>
+                                                </Dialog>
+                                            </div>
+                                        </TabsContent>
+
+                                    </Tabs>
+
+                                </div>
+
                         </div>
+
                     </div>
-                    )
-                }
+
+            </div>
+
+        </div>
+
+            </div >
+
+        </div >
+
+        <Dialog open={profileDialogOpen} onOpenChange={setProfileDialogOpen}>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Update Profile</DialogTitle>
+                    <DialogDescription>Update your personal information</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                    <Input
+                        placeholder="Phone Number"
+                        value={profileData.phone}
+                        onChange={(e) => setProfileData(prev => ({ ...prev, phone: e.target.value }))}
+                    />
+                    <Textarea
+                        placeholder="Address"
+                        value={profileData.address}
+                        onChange={(e) => setProfileData(prev => ({ ...prev, address: e.target.value }))}
+                    />
+                    <Input
+                        placeholder="Emergency Contact"
+                        value={profileData.emergencyContact}
+                        onChange={(e) => setProfileData(prev => ({ ...prev, emergencyContact: e.target.value }))}
+                    />
+                    <Button onClick={handleProfileUpdate} className="w-full">
+                        Update Profile
+                    </Button>
+                </div>
+            </DialogContent>
+        </Dialog>
+
+    {/* Transcript Upload Dialog */ }
+    <Dialog open={transcriptDialogOpen} onOpenChange={setTranscriptDialogOpen}>
+        <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Upload Documents</DialogTitle>
+                <DialogDescription>Upload your academic transcripts and certificates</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium mb-2">Transcripts</label>
+                    <Input
+                        type="file"
+                        accept=".doc,.docx"
+                        onChange={handleTranscriptUpload}
+                        multiple
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium mb-2">Certificates</label>
+                    <Input
+                        type="file"
+                        accept=".doc,.docx"
+                        onChange={handleCertificateUpload}
+                        multiple
+                    />
+                </div>
+                {transcriptData.transcripts.length > 0 && (
+                    <div>
+                        <h4 className="font-medium mb-2">Uploaded Transcripts:</h4>
+                        <ul className="space-y-1">
+                            {transcriptData.transcripts.map((file, index) => (
+                                <li key={index} className="text-sm text-slate-600">{file.name}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+                {transcriptData.certificates.length > 0 && (
+                    <div>
+                        <h4 className="font-medium mb-2">Uploaded Certificates:</h4>
+                        <ul className="space-y-1">
+                            {transcriptData.certificates.map((file, index) => (
+                                <li key={index} className="text-sm text-slate-600">{file.name}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+            </div>
+        </DialogContent>
+    </Dialog>
+
+    )
+}
