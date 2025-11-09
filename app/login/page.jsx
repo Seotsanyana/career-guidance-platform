@@ -3,12 +3,11 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { GraduationCap, Mail, Lock, User } from "lucide-react"
-import { useAuth } from "@/lib/auth-context-updated"
+import { useAuth } from "@/lib/auth-context"
 
 export default function LoginPage() {
   const router = useRouter()
-  const { login, signup } = useAuth()
+  const { login, signup, loading: authLoading, resendVerificationEmail } = useAuth()
   const [isLogin, setIsLogin] = useState(true)
   const [userType, setUserType] = useState("")
   const [formData, setFormData] = useState({
@@ -16,21 +15,24 @@ export default function LoginPage() {
     password: "",
     name: "",
     confirmPassword: "",
+    phone: "",
   })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
+  const [needsVerification, setNeedsVerification] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     setError("")
+    setSuccess("")
 
     // Validate user type selection
     const dashboardRoutes = {
       admin: "/admin",
       institution: "/institution",
       student: "/student",
-      graduate: "/graduate",
       company: "/company",
     }
 
@@ -43,11 +45,28 @@ export default function LoginPage() {
     try {
       if (isLogin) {
         await login(formData.email, formData.password, userType)
+        // Redirect to appropriate dashboard
+        router.push(dashboardRoutes[userType])
       } else {
         if (formData.password !== formData.confirmPassword) {
           throw new Error("Passwords do not match")
         }
-        await signup(formData.email, formData.password, formData.name, userType)
+
+        const additionalData = { phone: formData.phone }
+
+        // For students, collect additional info
+        if (userType === 'student') {
+          additionalData.lgcseResults = []
+          additionalData.gpa = 0
+          additionalData.qualificationLevel = ''
+          additionalData.field = ''
+          additionalData.institution = ''
+        }
+
+        const result = await signup(formData.email, formData.password, formData.name, userType, additionalData)
+
+        setSuccess("Account created successfully! You can now login.")
+        setIsLogin(true)
       }
 
       // Clear form data for security
@@ -56,14 +75,21 @@ export default function LoginPage() {
         password: "",
         name: "",
         confirmPassword: "",
+        phone: "",
       })
-
-      // Redirect to appropriate dashboard
-      router.push(dashboardRoutes[userType])
     } catch (err) {
       setError(err.message || "An error occurred")
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleResendVerification = async () => {
+    try {
+      await resendVerificationEmail()
+      setSuccess("Verification email sent! Please check your inbox.")
+    } catch (err) {
+      setError(err.message)
     }
   }
 
@@ -73,7 +99,6 @@ export default function LoginPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
           <Link href="/" className="flex items-center gap-2 mb-8">
-            <GraduationCap className="w-8 h-8 text-[#1e3a8a]" />
             <span className="text-2xl font-bold text-[#1e3a8a]">CareerPath</span>
           </Link>
 
@@ -91,12 +116,6 @@ export default function LoginPage() {
                 label="Student"
                 selected={userType === "student"}
                 onClick={() => setUserType("student")}
-              />
-              <UserTypeButton
-                type="graduate"
-                label="Graduate"
-                selected={userType === "graduate"}
-                onClick={() => setUserType("graduate")}
               />
               <UserTypeButton
                 type="institution"
@@ -121,31 +140,43 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
-                    placeholder="Enter your name"
-                    required={!isLogin}
-                  />
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
+                      placeholder="Enter your name"
+                      required={!isLogin}
+                    />
+                  </div>
                 </div>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number (Optional)</label>
+                  <div className="relative">
+                    <input
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
+                      placeholder="+266 XXX XXX XXX"
+                    />
+                  </div>
+                </div>
+              </>
             )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
+                  className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
                   placeholder="Enter your email"
                   required
                   autoComplete="off"
@@ -156,12 +187,11 @@ export default function LoginPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="password"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
+                  className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
                   placeholder="Enter your password"
                   required
                   autoComplete="new-password"
@@ -173,12 +203,11 @@ export default function LoginPage() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="password"
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
+                    className="w-full pl-4 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#14b8a6] focus:border-transparent"
                     placeholder="Confirm your password"
                     required={!isLogin}
                     autoComplete="new-password"
@@ -203,18 +232,50 @@ export default function LoginPage() {
               <div className="text-red-600 text-sm text-center">{error}</div>
             )}
 
+            {success && (
+              <div className="text-green-600 text-sm text-center bg-green-50 p-3 rounded-lg">{success}</div>
+            )}
+
+            {needsVerification && (
+              <div className="bg-blue-50 p-3 rounded-lg">
+                <p className="text-blue-800 text-sm mb-2">Didn't receive the verification email?</p>
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  className="text-blue-600 hover:text-blue-800 text-sm underline"
+                >
+                  Resend Verification Email
+                </button>
+              </div>
+            )}
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || authLoading}
               className="w-full bg-gradient-to-r from-[#1e3a8a] to-[#0d9488] text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              {loading ? "Please wait..." : (isLogin ? "Sign In" : "Create Account")}
+              {loading || authLoading ? "Please wait..." : (isLogin ? "Sign In" : "Create Account")}
             </button>
           </form>
 
           <p className="text-center text-gray-600 mt-6">
             {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <button onClick={() => setIsLogin(!isLogin)} className="text-[#14b8a6] hover:text-[#0d9488] font-semibold">
+            <button
+              onClick={() => {
+                setIsLogin(!isLogin)
+                setError("")
+                setSuccess("")
+                setNeedsVerification(false)
+                setFormData({
+                  email: "",
+                  password: "",
+                  name: "",
+                  confirmPassword: "",
+                  phone: "",
+                })
+              }}
+              className="text-[#14b8a6] hover:text-[#0d9488] font-semibold"
+            >
               {isLogin ? "Sign Up" : "Sign In"}
             </button>
           </p>
@@ -230,7 +291,6 @@ export default function LoginPage() {
         </div>
 
         <div className="relative text-white text-center max-w-lg">
-          <GraduationCap className="w-24 h-24 mx-auto mb-6" />
           <h2 className="text-4xl font-bold mb-4">Your Future Starts Here</h2>
           <p className="text-xl text-gray-100">
             Join thousands of students, institutions, and companies building successful careers together.

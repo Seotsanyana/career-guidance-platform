@@ -20,7 +20,7 @@ export default function InstitutionDashboard() {
     const [applicationDialogOpen, setApplicationDialogOpen] = useState(false)
 
     useEffect(() => {
-        if (!loading && (!user || user.role !== "institution")) {
+        if (!loading && !user) {
             router.push("/login")
         }
     }, [user, loading, router])

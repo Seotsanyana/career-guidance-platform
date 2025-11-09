@@ -9,19 +9,35 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Users, Search, Edit, Trash2, ArrowLeft } from "lucide-react"
+import { Users, Search, Edit, Trash2, ArrowLeft, Flag, CheckCircle, XCircle, AlertTriangle } from "lucide-react"
 
-// Function to get all registered users from localStorage
-const getAllUsers = () => {
-    const storedUsers = JSON.parse(localStorage.getItem("registeredUsers") || "{}")
-    return Object.values(storedUsers).map((user, index) => ({
-        id: user.id || index + 1,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        status: "active", // All registered users are considered active
-        joinDate: user.createdAt ? new Date(user.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
-    }))
+// Function to get all registered users from Firebase
+const getAllUsers = async () => {
+    try {
+        const { collection, getDocs } = await import('firebase/firestore')
+        const { db } = await import('@/lib/firebase-config')
+        const usersCollection = collection(db, 'users')
+        const usersSnapshot = await getDocs(usersCollection)
+
+        return usersSnapshot.docs.map((doc, index) => {
+            const userData = doc.data()
+            return {
+                id: doc.id,
+                name: userData.name || 'N/A',
+                email: userData.email || 'N/A',
+                role: userData.role || 'student',
+                status: userData.status || 'active',
+                flagged: userData.flagged || false,
+                flagReason: userData.flagReason || '',
+                joinDate: userData.createdAt ? new Date(userData.createdAt.seconds * 1000).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                lastLogin: userData.lastLogin ? new Date(userData.lastLogin.seconds * 1000).toISOString().split('T')[0] : 'Never',
+                loginCount: userData.loginCount || 0
+            }
+        })
+    } catch (error) {
+        console.error('Error fetching users:', error)
+        return []
+    }
 }
 
 export default function ManageUsersPage() {
@@ -30,6 +46,8 @@ export default function ManageUsersPage() {
     const [searchTerm, setSearchTerm] = useState("")
     const [roleFilter, setRoleFilter] = useState("all")
     const [statusFilter, setStatusFilter] = useState("all")
+    const [users, setUsers] = useState([])
+    const [loadingUsers, setLoadingUsers] = useState(true)
 
     useEffect(() => {
         if (!loading && (!user || user.role !== "admin")) {
@@ -37,7 +55,19 @@ export default function ManageUsersPage() {
         }
     }, [user, loading, router])
 
-    if (loading) {
+    useEffect(() => {
+        const fetchUsers = async () => {
+            setLoadingUsers(true)
+            const fetchedUsers = await getAllUsers()
+            setUsers(fetchedUsers)
+            setLoadingUsers(false)
+        }
+        if (user && user.role === "admin") {
+            fetchUsers()
+        }
+    }, [user])
+
+    if (loading || loadingUsers) {
         return <div className="min-h-screen flex items-center justify-center">Loading...</div>
     }
 
@@ -45,8 +75,7 @@ export default function ManageUsersPage() {
         return null
     }
 
-    const allUsers = getAllUsers()
-    const filteredUsers = allUsers.filter(user => {
+    const filteredUsers = users.filter(user => {
         const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             user.email.toLowerCase().includes(searchTerm.toLowerCase())
         const matchesRole = roleFilter === "all" || user.role === roleFilter
@@ -69,7 +98,82 @@ export default function ManageUsersPage() {
             case "active": return "default"
             case "inactive": return "secondary"
             case "pending": return "outline"
+            case "suspended": return "destructive"
             default: return "outline"
+        }
+    }
+
+    const handleActivateUser = async (userId) => {
+        try {
+            const { doc, updateDoc } = await import('firebase/firestore')
+            const { db } = await import('@/lib/firebase-config')
+            const userRef = doc(db, 'users', userId)
+            await updateDoc(userRef, {
+                status: 'active',
+                flagged: false,
+                flagReason: '',
+                updatedAt: new Date()
+            })
+            // Refresh users list
+            const fetchedUsers = await getAllUsers()
+            setUsers(fetchedUsers)
+        } catch (error) {
+            console.error('Error activating user:', error)
+        }
+    }
+
+    const handleDeactivateUser = async (userId) => {
+        try {
+            const { doc, updateDoc } = await import('firebase/firestore')
+            const { db } = await import('@/lib/firebase-config')
+            const userRef = doc(db, 'users', userId)
+            await updateDoc(userRef, {
+                status: 'inactive',
+                updatedAt: new Date()
+            })
+            // Refresh users list
+            const fetchedUsers = await getAllUsers()
+            setUsers(fetchedUsers)
+        } catch (error) {
+            console.error('Error deactivating user:', error)
+        }
+    }
+
+    const handleFlagUser = async (userId) => {
+        const reason = prompt('Enter reason for flagging this user:')
+        if (reason) {
+            try {
+                const { doc, updateDoc } = await import('firebase/firestore')
+                const { db } = await import('@/lib/firebase-config')
+                const userRef = doc(db, 'users', userId)
+                await updateDoc(userRef, {
+                    flagged: true,
+                    flagReason: reason,
+                    status: 'suspended',
+                    updatedAt: new Date()
+                })
+                // Refresh users list
+                const fetchedUsers = await getAllUsers()
+                setUsers(fetchedUsers)
+            } catch (error) {
+                console.error('Error flagging user:', error)
+            }
+        }
+    }
+
+    const handleDeleteUser = async (userId) => {
+        if (confirm('Are you sure you want to permanently delete this user? This action cannot be undone.')) {
+            try {
+                const { doc, deleteDoc } = await import('firebase/firestore')
+                const { db } = await import('@/lib/firebase-config')
+                const userRef = doc(db, 'users', userId)
+                await deleteDoc(userRef)
+                // Refresh users list
+                const fetchedUsers = await getAllUsers()
+                setUsers(fetchedUsers)
+            } catch (error) {
+                console.error('Error deleting user:', error)
+            }
         }
     }
 
@@ -125,6 +229,7 @@ export default function ManageUsersPage() {
                                     <SelectItem value="active">Active</SelectItem>
                                     <SelectItem value="inactive">Inactive</SelectItem>
                                     <SelectItem value="pending">Pending</SelectItem>
+                                    <SelectItem value="suspended">Suspended</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
@@ -166,13 +271,52 @@ export default function ManageUsersPage() {
                                         </TableCell>
                                         <TableCell>{new Date(user.joinDate).toLocaleDateString()}</TableCell>
                                         <TableCell>
-                                            <div className="flex gap-2">
-                                                <Button variant="outline" size="sm">
-                                                    <Edit className="h-4 w-4" />
+                                            <div className="flex gap-1 flex-wrap">
+                                                {user.status === 'active' ? (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="text-orange-600 hover:text-orange-700"
+                                                        onClick={() => handleDeactivateUser(user.id)}
+                                                        title="Deactivate User"
+                                                    >
+                                                        <XCircle className="h-4 w-4" />
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="text-green-600 hover:text-green-700"
+                                                        onClick={() => handleActivateUser(user.id)}
+                                                        title="Activate User"
+                                                    >
+                                                        <CheckCircle className="h-4 w-4" />
+                                                    </Button>
+                                                )}
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="text-yellow-600 hover:text-yellow-700"
+                                                    onClick={() => handleFlagUser(user.id)}
+                                                    title="Flag User"
+                                                >
+                                                    <Flag className="h-4 w-4" />
                                                 </Button>
-                                                <Button variant="outline" size="sm">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="text-red-600 hover:text-red-700"
+                                                    onClick={() => handleDeleteUser(user.id)}
+                                                    title="Delete User"
+                                                >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
+                                                {user.flagged && (
+                                                    <Badge variant="destructive" className="text-xs">
+                                                        <AlertTriangle className="h-3 w-3 mr-1" />
+                                                        Flagged
+                                                    </Badge>
+                                                )}
                                             </div>
                                         </TableCell>
                                     </TableRow>

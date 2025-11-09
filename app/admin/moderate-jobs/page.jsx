@@ -11,21 +11,43 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Briefcase, Search, Flag, Check, X, ArrowLeft, Eye } from "lucide-react"
 
-// Mock data for job postings
-const mockJobs = [
-    { id: 1, title: "Senior Frontend Developer", company: "Tech Corp", location: "New York", status: "active", applications: 24, postedDate: "2024-03-15", flagged: false },
-    { id: 2, title: "Full Stack Engineer", company: "StartupXYZ", location: "California", status: "active", applications: 18, postedDate: "2024-03-10", flagged: false },
-    { id: 3, title: "DevOps Engineer", company: "CloudTech", location: "Texas", status: "flagged", applications: 12, postedDate: "2024-03-08", flagged: true, flagReason: "Suspicious content" },
-    { id: 4, title: "Data Scientist", company: "DataCo", location: "Remote", status: "pending", applications: 0, postedDate: "2024-03-20", flagged: false },
-    { id: 5, title: "Product Manager", company: "InnovateInc", location: "Florida", status: "active", applications: 31, postedDate: "2024-03-12", flagged: false },
-    { id: 6, title: "UX Designer", company: "DesignStudio", location: "Illinois", status: "rejected", applications: 0, postedDate: "2024-03-18", flagged: true, flagReason: "Inappropriate content" },
-]
+// Function to get all job postings from Firebase
+const getAllJobs = async () => {
+    try {
+        const { collection, getDocs } = await import('firebase/firestore')
+        const { db } = await import('@/lib/firebase-config')
+        const jobsCollection = collection(db, 'jobs')
+        const jobsSnapshot = await getDocs(jobsCollection)
+
+        return jobsSnapshot.docs.map((doc) => {
+            const jobData = doc.data()
+            return {
+                id: doc.id,
+                title: jobData.title || 'N/A',
+                company: jobData.companyName || 'N/A',
+                location: jobData.location || 'N/A',
+                status: jobData.status || 'pending',
+                applications: jobData.applicationCount || 0,
+                postedDate: jobData.createdAt ? new Date(jobData.createdAt.seconds * 1000).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                flagged: jobData.flagged || false,
+                flagReason: jobData.flagReason || '',
+                description: jobData.description || '',
+                requirements: jobData.requirements || []
+            }
+        })
+    } catch (error) {
+        console.error('Error fetching jobs:', error)
+        return []
+    }
+}
 
 export default function ModerateJobsPage() {
     const { user, loading } = useAuth()
     const router = useRouter()
     const [searchTerm, setSearchTerm] = useState("")
     const [statusFilter, setStatusFilter] = useState("all")
+    const [jobs, setJobs] = useState([])
+    const [loadingJobs, setLoadingJobs] = useState(true)
 
     useEffect(() => {
         if (!loading && (!user || user.role !== "admin")) {
@@ -33,7 +55,19 @@ export default function ModerateJobsPage() {
         }
     }, [user, loading, router])
 
-    if (loading) {
+    useEffect(() => {
+        const fetchJobs = async () => {
+            setLoadingJobs(true)
+            const fetchedJobs = await getAllJobs()
+            setJobs(fetchedJobs)
+            setLoadingJobs(false)
+        }
+        if (user && user.role === "admin") {
+            fetchJobs()
+        }
+    }, [user])
+
+    if (loading || loadingJobs) {
         return <div className="min-h-screen flex items-center justify-center">Loading...</div>
     }
 
@@ -41,7 +75,7 @@ export default function ModerateJobsPage() {
         return null
     }
 
-    const filteredJobs = mockJobs.filter(job => {
+    const filteredJobs = jobs.filter(job => {
         const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             job.company.toLowerCase().includes(searchTerm.toLowerCase())
         const matchesStatus = statusFilter === "all" || job.status === statusFilter
@@ -58,19 +92,62 @@ export default function ModerateJobsPage() {
         }
     }
 
-    const handleApprove = (id) => {
-        // In a real app, this would make an API call
-        console.log(`Approving job ${id}`)
+    const handleApprove = async (jobId) => {
+        try {
+            const { doc, updateDoc } = await import('firebase/firestore')
+            const { db } = await import('@/lib/firebase-config')
+            const jobRef = doc(db, 'jobs', jobId)
+            await updateDoc(jobRef, {
+                status: 'active',
+                flagged: false,
+                flagReason: '',
+                updatedAt: new Date()
+            })
+            // Refresh jobs list
+            const fetchedJobs = await getAllJobs()
+            setJobs(fetchedJobs)
+        } catch (error) {
+            console.error('Error approving job:', error)
+        }
     }
 
-    const handleReject = (id) => {
-        // In a real app, this would make an API call
-        console.log(`Rejecting job ${id}`)
+    const handleReject = async (jobId) => {
+        try {
+            const { doc, updateDoc } = await import('firebase/firestore')
+            const { db } = await import('@/lib/firebase-config')
+            const jobRef = doc(db, 'jobs', jobId)
+            await updateDoc(jobRef, {
+                status: 'rejected',
+                updatedAt: new Date()
+            })
+            // Refresh jobs list
+            const fetchedJobs = await getAllJobs()
+            setJobs(fetchedJobs)
+        } catch (error) {
+            console.error('Error rejecting job:', error)
+        }
     }
 
-    const handleFlag = (id) => {
-        // In a real app, this would make an API call
-        console.log(`Flagging job ${id}`)
+    const handleFlag = async (jobId) => {
+        const reason = prompt('Enter reason for flagging this job:')
+        if (reason) {
+            try {
+                const { doc, updateDoc } = await import('firebase/firestore')
+                const { db } = await import('@/lib/firebase-config')
+                const jobRef = doc(db, 'jobs', jobId)
+                await updateDoc(jobRef, {
+                    flagged: true,
+                    flagReason: reason,
+                    status: 'flagged',
+                    updatedAt: new Date()
+                })
+                // Refresh jobs list
+                const fetchedJobs = await getAllJobs()
+                setJobs(fetchedJobs)
+            } catch (error) {
+                console.error('Error flagging job:', error)
+            }
+        }
     }
 
     return (

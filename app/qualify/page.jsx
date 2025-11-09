@@ -259,14 +259,24 @@ export default function QualifyPage() {
                                             </div>
                                         </div>
                                         <div>
-                                            <h4 className="font-medium text-slate-800 mb-2">Recommended Courses ({qualificationResults.qualificationLevel})</h4>
+                                            <h4 className="font-medium text-slate-800 mb-2">Eligible Universities</h4>
                                             <div className="space-y-2 max-h-40 overflow-y-auto">
-                                                {qualificationResults.recommendedCourses.slice(0, 5).map((course, index) => (
+                                                {[...new Set(qualificationResults.recommendedCourses.map(course => course.institution))].map((university, index) => (
                                                     <div key={index} className="text-sm text-slate-600">
-                                                        • {course.name} at {course.institution}
+                                                        • {university}
                                                     </div>
                                                 ))}
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-medium text-slate-800 mb-2">Recommended Courses ({qualificationResults.qualificationLevel})</h4>
+                                        <div className="space-y-2 max-h-40 overflow-y-auto">
+                                            {qualificationResults.recommendedCourses.slice(0, 5).map((course, index) => (
+                                                <div key={index} className="text-sm text-slate-600">
+                                                    • {course.name} at {course.institution}
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
                                 </CardContent>

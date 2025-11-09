@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { ArrowLeft, Plus, X } from "lucide-react"
+import { addJob } from "@/lib/jobs-data"
 
 export default function PostJobPage() {
     const { user, loading } = useAuth()
@@ -65,9 +66,24 @@ export default function PostJobPage() {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        // TODO: Implement job posting logic
-        console.log("Job posting data:", formData)
-        // For now, just navigate back to dashboard
+        // Prepare job data
+        const jobData = {
+            companyId: user.id,
+            companyName: user.name || user.email, // fallback to email if name not available
+            title: formData.title,
+            description: formData.description,
+            location: formData.location,
+            type: formData.type,
+            category: formData.category,
+            salary: formData.salary,
+            educationRequired: formData.educationRequired,
+            experienceRequired: formData.experienceRequired ? `${formData.experienceRequired} years` : "0 years",
+            requiredSkills: formData.requiredSkills,
+        }
+        // Add job to the system
+        const newJob = addJob(jobData)
+        console.log("Job posted successfully:", newJob)
+        // Navigate back to dashboard
         router.push("/company")
     }
 

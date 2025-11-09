@@ -1,0 +1,101 @@
+{"users": [
+{
+  "localId": "2PHu0SNNdDfRwibsIYPVZbJW4yO2",
+  "email": "limkokwinguniversity@lesotho.com",
+  "emailVerified": false,
+  "passwordHash": "ddTVO0R3EvdpOvBLvPE6Y86qCZIlKcbGk1oSwn2zYTPitdifqNCK16WTL0BOtoM+auqqYB0rDh2ZoAo57kKwOg==",
+  "salt": "j+df8Uh2DWSc7w==",
+  "createdAt": "1762310414100",
+  "disabled": false,
+  "providerUserInfo": []
+},
+{
+  "localId": "FynLEW605qaxBp3fFd8gb0PZi483",
+  "email": "test1762333467832@example.com",
+  "emailVerified": false,
+  "passwordHash": "A6I31AEvqI8BT9EewuDV1Aa40OohVeiaWeHIfuzolRXPPoxemEXP9+e90WWLKk1w79NakQbmO5IpD73Pfsd9vQ==",
+  "salt": "aLfccKhWyx8vxw==",
+  "lastSignedInAt": "1762333469215",
+  "createdAt": "1762333469215",
+  "providerUserInfo": []
+},
+{
+  "localId": "O3FGQnRgwuTHPsMRU9X4T7qxmMg2",
+  "email": "nedbank@lesotho.com",
+  "emailVerified": false,
+  "passwordHash": "kQjj5+BBRZ/W9fspGYNDwu7H6BaITe4mQ5KU7VoGLSq4rOTVEZiQeq6rdilaUIzheodADj+pvYBXJL9R9IdUow==",
+  "salt": "QSk34nF8/Wa46A==",
+  "createdAt": "1762310503866",
+  "disabled": false,
+  "providerUserInfo": []
+},
+{
+  "localId": "THa1mg4xPebLmuncHO8FJc34lU63",
+  "email": "test1762332727695@example.com",
+  "emailVerified": false,
+  "passwordHash": "nMyplLzRbI2wtxQaBdXCkXC4buD1RKpfKpZNBY7QLUnvuswVdBus4CDGOEk7H1vs7t8tFwhv3YECAJrhfyuG2g==",
+  "salt": "jTWY534mzlzV0g==",
+  "lastSignedInAt": "1762332728843",
+  "createdAt": "1762332728843",
+  "providerUserInfo": []
+},
+{
+  "localId": "VZRUd8zrHPVzrkenRN5pPxOpI1D3",
+  "email": "katleholeruo@gmail.com",
+  "emailVerified": false,
+  "passwordHash": "ssxPZzN9ismwvd7p8DLSILgreonLg5oPJj0Ghw34XdteAe1tti5/HyLK2E+LGiQxFUA1iEg+pNYYrvWERGJWNg==",
+  "salt": "n7/G4LCWV6/THw==",
+  "createdAt": "1762310452935",
+  "disabled": false,
+  "providerUserInfo": []
+},
+{
+  "localId": "bLP2QfVWycNToTrXsmNj2z1pEez1",
+  "email": "test1762312267636@example.com",
+  "emailVerified": false,
+  "passwordHash": "ZCWK66C8A53ut+lCEuoUgU/a4o4meYiUHuOebZ0NrwBgY+XvK7cD+lY7kPotlWBl6t/4pZMjRa2OIcYIN40rew==",
+  "salt": "oV9JQhCfUHKKQA==",
+  "lastSignedInAt": "1762312268661",
+  "createdAt": "1762312268661",
+  "providerUserInfo": []
+},
+{
+  "localId": "meqeY82j1mhzhHhz2sNHrVnJhiJ2",
+  "email": "test1762331406293@example.com",
+  "emailVerified": false,
+  "passwordHash": "Rmz3ktVVtDJBi1HgOUyWvbPbeg2siBpqGdmDZBlV/RzEkV13fFEzPytRyCzVv9clfCeHLNfwR/oKEiSONsgREA==",
+  "salt": "+/XOkLchksavRg==",
+  "lastSignedInAt": "1762331407334",
+  "createdAt": "1762331407334",
+  "providerUserInfo": []
+},
+{
+  "localId": "p9ANs0YVCfXZ21Ri5ZuMiyKcOI52",
+  "email": "monyauseotsanyana7@gmail.com",
+  "emailVerified": false,
+  "passwordHash": "k1wHKRgQ5t/0oa2twWtU+vPD0PgA4Oim3Y/y/w3XUE/5fKsRMH90+Qh8aikrYvII88SLIwnYhqcsl2hUZh+Yug==",
+  "salt": "/RIgV9EwqJ3QZQ==",
+  "lastSignedInAt": "1762309117707",
+  "createdAt": "1762309117707",
+  "providerUserInfo": []
+},
+{
+  "localId": "xF221FiwyiVov9YOcnXyOya9Ixq2",
+  "email": "test1762331284674@example.com",
+  "emailVerified": false,
+  "passwordHash": "bL74xtBMH/dTFJAnM7UqX8mwiP8kXSgvbNMPGbHY9ZxRrKiuUCrgCXlsG2RTSbCdTKxDgpEXUZl25+OYaigLPQ==",
+  "salt": "Qiz9IBUUcu+b9Q==",
+  "lastSignedInAt": "1762331285823",
+  "createdAt": "1762331285823",
+  "providerUserInfo": []
+},
+{
+  "localId": "xIZhgJ3TgjRu3pmbSs9Vlg9AHVj1",
+  "email": "thaboseisa@gmail.com",
+  "emailVerified": false,
+  "passwordHash": "joHLmtErIidQ7pOT1V6Zl2aaWNo5LsjYX5MIxz0YPqIslNnejmNQSaMWJVtjE2Mo4rV/Z+TwpXds32ENk2YaVg==",
+  "salt": "iCsP0HxE70q9xQ==",
+  "createdAt": "1762310381814",
+  "disabled": false,
+  "providerUserInfo": []
+}]}

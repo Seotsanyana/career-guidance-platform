@@ -2,11 +2,12 @@
 
 import { useAuth } from "@/lib/auth-context-updated"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Briefcase, Users, TrendingUp, Plus, Eye, Target, Building, MapPin, Calendar, Phone } from "lucide-react"
+import { getJobsByCompany } from "@/lib/jobs-data"
 
 const basothoNames = [
     "Pule Mochaki", "Mpho Mokone", "Nthabiseng Molefi", "Thabo Mothibe", "Lerato Mphuthi",
@@ -20,12 +21,20 @@ const basothoNames = [
 export default function CompanyDashboard() {
     const { user, loading } = useAuth()
     const router = useRouter()
+    const [companyJobs, setCompanyJobs] = useState([])
 
     useEffect(() => {
         if (!loading && (!user || user.role !== "company")) {
             router.push("/login")
         }
     }, [user, loading, router])
+
+    useEffect(() => {
+        if (user && user.id) {
+            const jobs = getJobsByCompany(user.id)
+            setCompanyJobs(jobs)
+        }
+    }, [user])
 
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center">Loading...</div>
@@ -110,7 +119,7 @@ export default function CompanyDashboard() {
                                     <Briefcase className="h-6 w-6 text-blue-600" />
                                 </div>
                                 <div>
-                                    <p className="text-2xl font-bold">12</p>
+                                    <p className="text-2xl font-bold">{companyJobs.length}</p>
                                     <p className="text-sm text-slate-600">Active Jobs</p>
                                 </div>
                             </div>
@@ -228,29 +237,26 @@ export default function CompanyDashboard() {
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                                    <div>
-                                        <p className="font-medium">Senior Frontend Developer</p>
-                                        <p className="text-sm text-slate-600">24 applications • Posted 3 days ago</p>
+                                {companyJobs.length > 0 ? (
+                                    companyJobs.slice(0, 3).map((job) => (
+                                        <div key={job.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                                            <div>
+                                                <p className="font-medium">{job.title}</p>
+                                                <p className="text-sm text-slate-600">
+                                                    {job.applications} applications • Posted {new Date(job.postedDate).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                            <Badge className="bg-green-100 text-green-800">Active</Badge>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-8">
+                                        <p className="text-slate-600">No active job postings yet.</p>
+                                        <Button className="mt-4" onClick={() => router.push('/company/post-job')}>
+                                            Post Your First Job
+                                        </Button>
                                     </div>
-                                    <Badge className="bg-green-100 text-green-800">Active</Badge>
-                                </div>
-
-                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                                    <div>
-                                        <p className="font-medium">Full Stack Engineer</p>
-                                        <p className="text-sm text-slate-600">18 applications • Posted 1 week ago</p>
-                                    </div>
-                                    <Badge className="bg-green-100 text-green-800">Active</Badge>
-                                </div>
-
-                                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                                    <div>
-                                        <p className="font-medium">DevOps Engineer</p>
-                                        <p className="text-sm text-slate-600">12 applications • Posted 2 weeks ago</p>
-                                    </div>
-                                    <Badge className="bg-green-100 text-green-800">Active</Badge>
-                                </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>

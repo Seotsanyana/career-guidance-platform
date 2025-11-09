@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { GraduationCap, Building2, Users, Briefcase, Award } from "lucide-react"
 
 export default function HomePage() {
   return (
@@ -8,12 +7,12 @@ export default function HomePage() {
       <header className="bg-gradient-to-br from-[#1e3a8a] to-[#0d9488] text-white">
         <nav className="container mx-auto px-4 py-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <GraduationCap className="w-8 h-8" />
             <span className="text-2xl font-bold">Lesotho Career Guidance</span>
           </div>
           <Link
             href="/login"
             className="bg-white text-[#1e3a8a] px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+            target="_self"
           >
             Login
           </Link>
@@ -27,6 +26,7 @@ export default function HomePage() {
           <Link
             href="/login"
             className="inline-block bg-[#14b8a6] text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-[#0d9488] transition-colors"
+            target="_self"
           >
             Get Started
           </Link>
@@ -40,31 +40,26 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
             <ModuleCard
-              icon={<Users className="w-12 h-12" />}
               title="Admin Portal"
               description="Manage institutions, courses, and oversee the entire platform with comprehensive analytics."
               color="bg-[#1e3a8a]"
             />
             <ModuleCard
-              icon={<Building2 className="w-12 h-12" />}
               title="Institution Hub"
               description="Post courses, manage applications, and connect with qualified students efficiently."
               color="bg-[#0d9488]"
             />
             <ModuleCard
-              icon={<GraduationCap className="w-12 h-12" />}
               title="Student Center"
               description="Discover courses, take career assessments, and apply to your dream programs."
               color="bg-[#14b8a6]"
             />
             <ModuleCard
-              icon={<Award className="w-12 h-12" />}
               title="Graduate Hub"
               description="Access job recommendations, professional development courses, and career networking opportunities."
               color="bg-[#7c3aed]"
             />
             <ModuleCard
-              icon={<Briefcase className="w-12 h-12" />}
               title="Company Connect"
               description="Post jobs, find talent, and connect with qualified candidates automatically."
               color="bg-[#1e40af]"
@@ -91,8 +86,8 @@ export default function HomePage() {
             </div>
             <div className="bg-gradient-to-br from-[#1e3a8a] to-[#0d9488] rounded-2xl p-12 text-white">
               <div className="space-y-6">
-                <StatCard number="5,000+" label="Lesotho Students" />
-                <StatCard number="20+" label="Higher Education Institutions" />
+                <StatCard number="20,000+" label="Lesotho Students" />
+                <StatCard number="7" label="Higher Education Institutions" />
                 <StatCard number="500+" label="Job Opportunities" />
                 <StatCard number="95%" label="Match Success Rate" />
               </div>
@@ -114,7 +109,6 @@ export default function HomePage() {
           <div className="grid md:grid-cols-5 gap-6 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <GraduationCap className="w-6 h-6" />
                 <span className="text-xl font-bold">Lesotho Career Guidance</span>
               </div>
               <p className="text-gray-300">Empowering Lesotho students with comprehensive career guidance across all sectors.</p>
@@ -124,17 +118,17 @@ export default function HomePage() {
               <h3 className="font-semibold mb-4">For Students</h3>
               <ul className="space-y-2 text-gray-300">
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     LGCSE Course Matching
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     Career Assessment
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     Multi-Sector Job Opportunities
                   </Link>
                 </li>
@@ -145,17 +139,17 @@ export default function HomePage() {
               <h3 className="font-semibold mb-4">For Graduates</h3>
               <ul className="space-y-2 text-gray-300">
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     Job Recommendations
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     Professional Development
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     Career Networking
                   </Link>
                 </li>
@@ -166,17 +160,17 @@ export default function HomePage() {
               <h3 className="font-semibold mb-4">For Institutions</h3>
               <ul className="space-y-2 text-gray-300">
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     Post Courses
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     Manage Applications
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     Analytics
                   </Link>
                 </li>
@@ -187,17 +181,17 @@ export default function HomePage() {
               <h3 className="font-semibold mb-4">For Companies</h3>
               <ul className="space-y-2 text-gray-300">
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     Post Jobs
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     Find Talent
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" className="hover:text-[#14b8a6]">
+                  <Link href="/login" className="hover:text-[#14b8a6]" target="_self">
                     Recruitment Tools
                   </Link>
                 </li>
@@ -214,10 +208,10 @@ export default function HomePage() {
   )
 }
 
-function ModuleCard({ icon, title, description, color }) {
+function ModuleCard({ title, description, color }) {
   return (
     <div className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow">
-      <div className={`${color} text-white w-16 h-16 rounded-lg flex items-center justify-center mb-4`}>{icon}</div>
+      <div className={`${color} text-white w-16 h-16 rounded-lg flex items-center justify-center mb-4 text-2xl font-bold`}>{title.charAt(0)}</div>
       <h3 className="text-xl font-bold mb-2 text-[#1e3a8a]">{title}</h3>
       <p className="text-gray-600">{description}</p>
     </div>
@@ -227,11 +221,7 @@ function ModuleCard({ icon, title, description, color }) {
 function BenefitItem({ text }) {
   return (
     <li className="flex items-center gap-3">
-      <div className="w-6 h-6 rounded-full bg-[#14b8a6] flex items-center justify-center flex-shrink-0">
-        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
+      <div className="w-6 h-6 rounded-full bg-[#14b8a6] flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">✓</div>
       <span className="text-gray-700">{text}</span>
     </li>
   )

@@ -1,9 +1,9 @@
 "use client"
 
-import { useAuth } from "@/lib/auth-context"
+import { useAuth } from "@/lib/auth-context-updated"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { GraduationCap, LogOut, Menu } from "lucide-react"
+import { LogOut, Menu } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
 
@@ -15,8 +15,6 @@ export default function DashboardLayout({ children, title, role }) {
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login")
-    } else if (user && user.role !== role) {
-      router.push(`/${user.role}`)
     }
   }, [user, loading, role, router])
 
@@ -43,7 +41,6 @@ export default function DashboardLayout({ children, title, role }) {
               </button>
 
               <Link href="/" className="flex items-center gap-2">
-                <GraduationCap className="w-8 h-8 text-[#1e3a8a]" />
                 <span className="text-xl font-bold text-[#1e3a8a]">CareerPath</span>
               </Link>
             </div>
