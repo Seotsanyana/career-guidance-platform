@@ -29,3 +29,43 @@ Modify authentication to use predefined credentials for institutions/companies, 
 - Test company login with predefined credentials
 - Test student signup/login via Firebase
 - Test admin login with specific email
+
+# Deployment Setup
+
+## Firebase Deployment
+
+### Prerequisites
+
+- Firebase project set up
+- Firebase CLI installed
+
+### Steps
+
+1. Go to GitHub repository settings > Secrets and variables > Actions
+2. Add secret: `FIREBASE_SERVICE_ACCOUNT` with the JSON content of your Firebase service account key
+3. The workflow will automatically deploy on push to master
+
+## Render Deployment
+
+### Prerequisites
+
+- Render account
+- Create a new Web Service in Render connected to your GitHub repo
+- Set build command: `npm run build`
+- Set start command: `npm start`
+
+### Steps
+
+1. In Render dashboard, get your service ID
+2. Go to Render account settings > API Keys, generate an API key
+3. Go to GitHub repository settings > Secrets and variables > Actions
+4. Add secrets:
+   - `RENDER_SERVICE_ID`: Your Render service ID
+   - `RENDER_API_KEY`: Your Render API key
+5. The workflow will automatically deploy on push to master
+
+## Notes
+
+- Firebase will deploy the static export (no API routes)
+- Render will deploy the full Next.js app with API routes
+- Ensure environment variables are set in Render for Firebase config
